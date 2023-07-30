@@ -34,10 +34,10 @@ namespace RS_DATASTRUCTURES.Queue
 
         public T? PeekLast() => list.Last is null ? default(T) : list.Last.Value;
 
-        /// Adds at the End of the Queue
+        /// Enqueue - Adds at the End of the Queue
         public void Add(T value) => list.AddLast(value);
 
-        /// Removes from the Top of the Queue
+        /// Dequeue - Removes from the Top of the Queue
         public T? Remove() {
             if (this.IsEmpty()) throw new InvalidOperationException("Cant Remove from empty Queue");
             var result = PeekFirst();
