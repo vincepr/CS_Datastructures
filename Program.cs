@@ -1,4 +1,4 @@
-﻿using RS_DATASTRUCTURES.Queue;
+﻿using RS_DATASTRUCTURES.DisjoinedSet;
 
 
 
