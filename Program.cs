@@ -1,4 +1,4 @@
-﻿using RS_DATASTRUCTURES.DisjoinedSet;
+﻿using RS_DATASTRUCTURES.BinaryTree;
 
 
 

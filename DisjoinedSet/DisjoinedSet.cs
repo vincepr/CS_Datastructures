@@ -5,6 +5,11 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
+/*
+ * 
+ * Implementation for Disjoined Set, aka a Union-Find.
+ * 
+ */
 
 namespace RS_DATASTRUCTURES.DisjoinedSet
 {
