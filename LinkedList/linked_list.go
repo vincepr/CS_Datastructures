@@ -2,8 +2,6 @@ package main
 
 import "fmt"
 
-
-
 func main() {
 	// linked list example:
     var m = map[int]string{1: "2", 2: "4", 4: "8"}
