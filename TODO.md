@@ -4,7 +4,10 @@
 - [x] Stack
 - [x] Linked List (singly/double)
 - [x] Queue (linkedlist/array)
-- [] Priority Queue (min/max)
+- [x] Priority Queue (min/max)
     - vs Heap
-- Union Find (kruskals Algorithm)
+- [x] Union Find (kruskals Algorithm)
 - Binary Search Tree
+    - insert
+    - remove
+    - preorder, inorder, postorder, level-order, traversals

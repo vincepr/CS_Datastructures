@@ -5,7 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RS_DATASTRUCTURES.BinaryTree
+namespace RS_DATASTRUCTURES.BinarySearchTree
 {
     public class Example
     {

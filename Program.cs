@@ -1,4 +1,4 @@
-﻿using RS_DATASTRUCTURES.BinaryTree;
+﻿using RS_DATASTRUCTURES.BinarySearchTree;
 
 
 
