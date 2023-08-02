@@ -85,9 +85,16 @@ namespace RS_DATASTRUCTURES.HashTable
 
         /* Attributes */
         private const int START_CAPACITY = 8;
+
         private Entry?[] entries;
+
         public int Count { get; private set; }
-        private int version = 0;                      /// version, so we can throw if Enumerator changed mid consuming.
+
+        /// <summary>
+        /// version, so we can throw if Enumerator changed mid consuming.
+        /// </summary>
+        private int version = 0;                
+        
         public int Capacity => entries.Length;        /// nr of buckets
 
         public ChainingHashTable(int CAPACITY = START_CAPACITY)
@@ -233,6 +240,5 @@ namespace RS_DATASTRUCTURES.HashTable
                 }
             }
         }
-
     }
 }
