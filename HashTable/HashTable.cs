@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 /*
  * 
- * Implementation for Disjoined Set, aka a Union-Find.
+ * Implementation for a Hash Map
+ * - using Separate Chaining (with linked list-ish chaining)
  * 
  */
 
@@ -90,7 +91,7 @@ namespace RS_DATASTRUCTURES.HashTable
             int targetBucket = (hashcode & int.MaxValue) % entries.Length;
             Entry? targetEntry = entries[targetBucket];
             
-            if (targetEntry is null)                // first in bucket just write to it
+            if (targetEntry is null)                // add directly to bucket (first element)
             {
                 entries[targetBucket] = new Entry(key, value, hashcode, null);
                 Count++;
