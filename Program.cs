@@ -1,7 +1,7 @@
-﻿using RS_DATASTRUCTURES.BinarySearchTree;
+﻿
 
 
 
 //SingleLinkedList<int> x = new SingleLinkedList<int>();
 
-Example.Run();
+RS_DATASTRUCTURES.HashTable.Example.Run();
