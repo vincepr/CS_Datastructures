@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 /*
  * 
- * Implementation for a Hash Map
+ * Implementation for a Hash Table
  * 
  * - using Separate Chaining (with linked-list'ish chaining)
  * - null as key feels wrong to implement so i just exluded it
@@ -54,8 +54,6 @@ namespace RS_DATASTRUCTURES.HashTable
                 Console.WriteLine($"<{key} {value}>");
             if (table2.Contains("James"))
                 Console.WriteLine($"James is {table2["James"]}");
-
-
         }
     }
 
