@@ -40,7 +40,7 @@ namespace RS_DATASTRUCTURES.HashTable
             table.Remove(51);
             Console.WriteLine($"{table.Contains(51)} {table.GetValue(51)}");  // true 71
 
-            var table2 = new SimpleHashTable<String, int>(("Bob",24),("JAmes",34));
+            var table2 = new SimpleHashTable<String, int>(("Bob",24),("James",34));
             foreach(var (key, value) in table2)
                 Console.WriteLine($"[{key} {value}]");
 
@@ -94,8 +94,6 @@ namespace RS_DATASTRUCTURES.HashTable
             entries = new Entry[START_CAPACITY];
             foreach (var pair in pairs)
                 Add(pair.Item1, pair.Item2);
-                
-
         }
 
         /* functionality METHODS */
