@@ -1,8 +1,10 @@
-namespace RS_DATASTRUCTURES.Stack;
+namespace src.datastructures.Stack;
 using System.Collections;
 
-public static class Example{
-    public static void Run() {
+public static class Example
+{
+    public static void Run()
+    {
         Console.WriteLine("--- BasicStack Example: ---");
 
         var st = new BasicStack<string>(1);
@@ -12,13 +14,15 @@ public static class Example{
         st.Push("World");
         st.Push("Whatsup");
 
-        foreach (var item in st){
+        foreach (var item in st)
+        {
             Console.WriteLine(item.ToString());
         }
 
         // what happens if we iterate over empty?
         var st_empty = new BasicStack<string>(2);
-        foreach (var item in st_empty){
+        foreach (var item in st_empty)
+        {
             Console.WriteLine(item.ToString());
         }
 
@@ -32,15 +36,15 @@ public sealed class BasicStack<T> : IEnumerable<T>
     private const int defaultSize = 30;
     private int index;
     private int version;    /// this version is needed to make the Enumerator throw if accessed after change
-    public BasicStack(int size = defaultSize) 
+    public BasicStack(int size = defaultSize)
     {
         if (size <= 0) throw new ArgumentOutOfRangeException(nameof(size), "Size must be bigger than 0");
-        this.arrayData = new T[size];
-        this.index = 0;
-        this.version = 0;
+        arrayData = new T[size];
+        index = 0;
+        version = 0;
     }
 
-    public T Pop() 
+    public T Pop()
     {
         if (index == 0) throw new InvalidOperationException("Tried to remove from Empty Stack");
         index--;
@@ -48,11 +52,12 @@ public sealed class BasicStack<T> : IEnumerable<T>
         return arrayData[index];
     }
 
-    public void Push(T value) 
+    public void Push(T value)
     {
         // Dynamic Array doubles in Size when full (but NEVER Shrinks!):
-        if (index == arrayData.Length) {
-            T[] newArr = new T[2*arrayData.Length];
+        if (index == arrayData.Length)
+        {
+            T[] newArr = new T[2 * arrayData.Length];
             Array.Copy(arrayData, newArr, arrayData.Length);
             arrayData = newArr;
         }
@@ -60,8 +65,9 @@ public sealed class BasicStack<T> : IEnumerable<T>
         version++;
     }
 
-    public override string ToString(){
-        return "Stack<"+string.Join(", ", arrayData)+">";
+    public override string ToString()
+    {
+        return "Stack<" + string.Join(", ", arrayData) + ">";
     }
 
     // To satisfy IEnumerable we have to provide the following 2 Methods to the iterator:
@@ -84,10 +90,11 @@ public sealed class BasicStack<T> : IEnumerable<T>
         private BasicStack<T> stack;
         private int index;
         private int usedVersion;
-        public Enumerator(BasicStack<T> stack){
+        public Enumerator(BasicStack<T> stack)
+        {
             this.stack = stack;
-            this.index = stack.index;
-            this.usedVersion = stack.version;
+            index = stack.index;
+            usedVersion = stack.version;
         }
 
         /* The Enumerator implementation */
@@ -108,7 +115,7 @@ public sealed class BasicStack<T> : IEnumerable<T>
         {
             CheckVersion();
             index--;
-            if (index < 0 ) return false;   // reached end
+            if (index < 0) return false;   // reached end
             else return true;
         }
 
@@ -120,14 +127,15 @@ public sealed class BasicStack<T> : IEnumerable<T>
 
         /* Helpers */
 
-        private T GetCurrent(int index) 
+        private T GetCurrent(int index)
         {
             if (index < 0) throw new InvalidOperationException("Enumerator already empty.");
             return stack.arrayData[index];
         }
 
         /// As Enumerator demands -> will throw if original Stack was modified and iterator is out of sync.
-        private void CheckVersion(){
+        private void CheckVersion()
+        {
             if (usedVersion != stack.version) throw new InvalidOperationException("Collection modified since created.");
         }
     }

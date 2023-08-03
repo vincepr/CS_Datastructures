@@ -18,7 +18,7 @@ using System.Threading.Tasks;
  * 
  */
 
-namespace RS_DATASTRUCTURES.HashTable;
+namespace src.datastructures.HashTable;
 
 public static class Example
 {
@@ -31,8 +31,8 @@ public static class Example
             {23, 42},
         };
 
-        for(int i = 10; i < 20; i++)
-            table[i] = i*i*i;
+        for (int i = 10; i < 20; i++)
+            table[i] = i * i * i;
 
         foreach (var pair in table)
             Console.WriteLine($"{pair}");
@@ -47,10 +47,10 @@ public static class Example
 
 
         Console.WriteLine("\n--- --- ---");
-        var table2 = new ChainingHashTable<String, int>(("Bob",24),("James",34),("Gandalf", 5000));
+        var table2 = new ChainingHashTable<string, int>(("Bob", 24), ("James", 34), ("Gandalf", 5000));
         table2["Gandalf"] = 55555;
         table2.Remove("Bob");
-        foreach(var (key, value) in table2)
+        foreach (var (key, value) in table2)
             Console.WriteLine($"<{key} {value}>");
         if (table2.Contains("James"))
             Console.WriteLine($"James is {table2["James"]}");
@@ -62,7 +62,7 @@ public static class Example
 /// </summary>
 /// <typeparam name="K">key</typeparam>
 /// <typeparam name="V">value</typeparam>
-public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> where K : notnull
+public sealed class ChainingHashTable<K, V> : IEnumerable<KeyValuePair<K, V>> where K : notnull
 {
     /// <summary>
     /// Represents a single key-value pair in our list
@@ -76,10 +76,10 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
 
         public Entry(K key, V value, int hashcode, Entry? next = null)
         {
-            this.Key = key;
-            this.Value = value;
-            this.Hashcode = hashcode;
-            this.Next = next;
+            Key = key;
+            Value = value;
+            Hashcode = hashcode;
+            Next = next;
         }
     }
 
@@ -93,20 +93,20 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
     /// <summary>
     /// version, so we can throw if Enumerator changed mid consuming.
     /// </summary>
-    private int version = 0;                
-    
+    private int version = 0;
+
     // Number of buckets
-    public int Capacity => entries.Length;        
+    public int Capacity => entries.Length;
 
     public ChainingHashTable(int CAPACITY = START_CAPACITY)
     {
-        CAPACITY = (CAPACITY > START_CAPACITY) ? CAPACITY : START_CAPACITY;
+        CAPACITY = CAPACITY > START_CAPACITY ? CAPACITY : START_CAPACITY;
         entries = new Entry[CAPACITY];
     }
 
     public ChainingHashTable(params (K, V)[] pairs)
     {
-        int capacity = (pairs.Length*2 > START_CAPACITY) ? pairs.Length*2 : START_CAPACITY;
+        int capacity = pairs.Length * 2 > START_CAPACITY ? pairs.Length * 2 : START_CAPACITY;
         entries = new Entry[capacity];
         foreach (var pair in pairs)
             Add(pair.Item1, pair.Item2);
@@ -119,9 +119,9 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
         int hashcode = key.GetHashCode();
         int targetBucket = (hashcode & int.MaxValue) % entries.Length;
         Entry? targetEntry = entries[targetBucket];
-        
+
         // add directly to bucket (first element)
-        if (targetEntry is null)                
+        if (targetEntry is null)
         {
             entries[targetBucket] = new Entry(key, value, hashcode, null);
             Count++;
@@ -132,14 +132,14 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
         while (targetEntry is not null)
         {
             // overwrite existing value
-            if(key.Equals(targetEntry.Key))    
+            if (key.Equals(targetEntry.Key))
             {
                 targetEntry.Value = value;
                 return;
             }
 
             // add at end of linked list
-            if (targetEntry.Next is null)       
+            if (targetEntry.Next is null)
             {
                 targetEntry.Next = new Entry(key, value, hashcode, null);
                 Count++;
@@ -173,7 +173,7 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
             if (current.Hashcode == hashcode && key.Equals(current.Key))
             {
                 // found Entry - so we remove it from linked list
-                previous.Next = current.Next;       
+                previous.Next = current.Next;
                 return;
             }
             previous = current;
@@ -188,7 +188,7 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
     public V? GetValue(K key)
     {
         var entry = FindEntry(key);
-        if (entry is null) return default(V);
+        if (entry is null) return default;
         return entry.Value;
     }
 
@@ -202,19 +202,19 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
         if (Count < Capacity * LOADFACTOR) return;
 
         var newCapacity = Capacity * GROWFACTOR;
-        var oldEntries = this.entries;
-        this.entries = new Entry[newCapacity];
+        var oldEntries = entries;
+        entries = new Entry[newCapacity];
         foreach (var e in oldEntries)
         {
-            if (e is not null) 
+            if (e is not null)
             {
                 // copy roots
-                this.Add(e.Key, e.Value);
+                Add(e.Key, e.Value);
                 var next = e.Next;
                 // copy linked elements
                 while (next is not null)
                 {
-                    this.Add(next.Key, next.Value);
+                    Add(next.Key, next.Value);
                     next = next.Next;
                 }
             }
@@ -239,15 +239,15 @@ public sealed class ChainingHashTable<K, V>  : IEnumerable<KeyValuePair<K, V>> w
     public V? this[K key]
     {
         get => GetValue(key);
-        set{ Add(key, value!); }
+        set { Add(key, value!); }
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-    
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
     public IEnumerator<KeyValuePair<K, V>> GetEnumerator()
     {
         var version = this.version;
-        foreach(var entry in entries)
+        foreach (var entry in entries)
         {
             var current = entry;
             while (current is not null)

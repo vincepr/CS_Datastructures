@@ -4,4 +4,6 @@
 
 //SingleLinkedList<int> x = new SingleLinkedList<int>();
 
-RS_DATASTRUCTURES.PriorityQueue.Example.Run();
+using src.datastructures.PriorityQueue;
+
+Example.Run();

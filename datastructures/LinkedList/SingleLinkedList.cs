@@ -1,18 +1,18 @@
 using System.Collections;
 
-namespace RS_DATASTRUCTURES.LinkedList;
+namespace src.datastructures.LinkedList;
 
 public static class Example
 {
-    public static void Run() 
+    public static void Run()
     {
         Console.WriteLine("--- (Singly)LinkedList Example: ---");
         var list = new SingleLinkedList<string>();
 
-        Console.WriteLine("we expect .First on empty list to be null: "+ list.First is null);
+        Console.WriteLine("we expect .First on empty list to be null: " + list.First is null);
 
-        foreach (var item in list) Console.WriteLine("list empty -> this never gets reached"); 
-        
+        foreach (var item in list) Console.WriteLine("list empty -> this never gets reached");
+
         list.AddFirst("1");
         list.AddFirst("2");
         list.AddFirst("3");
@@ -33,49 +33,53 @@ public static class Example
 }
 
 /// Singly linked list implementation.
-public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
+public sealed class SingleLinkedList<T> : IEnumerable<T> where T : IComparable<T>
 {
-    public NodeLinkedList<T>? First {get; private set;}
-    public SingleLinkedList(T[]? values = null) 
+    public NodeLinkedList<T>? First { get; private set; }
+    public SingleLinkedList(T[]? values = null)
     {
-        this.First = null;
-        if (values != null) {
-            foreach (var value in values.Reverse()) {
-                this.AddFirst(value);
+        First = null;
+        if (values != null)
+        {
+            foreach (var value in values.Reverse())
+            {
+                AddFirst(value);
             }
         }
     }
 
     /// Adds entry to the Top of the List
-    public void AddFirst(T value) 
+    public void AddFirst(T value)
     {
         var newNode = new NodeLinkedList<T>(value);
-        newNode.Next = this.First;
-        this.First = newNode;
+        newNode.Next = First;
+        First = newNode;
     }
 
-    public NodeLinkedList<T>? GetNext(NodeLinkedList<T> previous) 
+    public NodeLinkedList<T>? GetNext(NodeLinkedList<T> previous)
     {
         if (previous == null) return null;
         return previous.Next;
     }
 
 
-    public int Count => this.Aggregate(0, (acc, _)=> acc + 1);
+    public int Count => this.Aggregate(0, (acc, _) => acc + 1);
 
-    public void AddAfter(NodeLinkedList<T> node, T valueToAdd) 
+    public void AddAfter(NodeLinkedList<T> node, T valueToAdd)
     {
         var newNode = new NodeLinkedList<T>(valueToAdd);
         newNode.Next = node.Next;
         node.Next = newNode;
     }
 
-    public bool Remove(NodeLinkedList<T>? node) 
+    public bool Remove(NodeLinkedList<T>? node)
     {
-        var prev = this.First;
-        while (prev is not null) {
+        var prev = First;
+        while (prev is not null)
+        {
             if (prev is null || prev.Next is null) return false;       // couldnt find node
-            if (prev.Next == node) {
+            if (prev.Next == node)
+            {
                 // do steps to remove
                 prev.Next = node.Next;
                 return true;
@@ -86,10 +90,11 @@ public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
         return false;
     }
 
-    public NodeLinkedList<T>? FindNode(T value) 
+    public NodeLinkedList<T>? FindNode(T value)
     {
-        var node = this.First;
-        while (node is not null) {
+        var node = First;
+        while (node is not null)
+        {
             if (node.Value.Equals(value)) return node;
             node = node.Next;
         }
@@ -113,16 +118,19 @@ public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
         private NodeLinkedList<T>? previous;
         private NodeLinkedList<T>? next;
 
-        public Enumerator(SingleLinkedList<T> list) 
+        public Enumerator(SingleLinkedList<T> list)
         {
-            this.originalList = list;
-            if (list.First is null) {
+            originalList = list;
+            if (list.First is null)
+            {
                 // called with empty list 
-                this.previous = null;
-                this.next = null;
-            } else {
-                this.previous = null;
-                this.next = list.First;
+                previous = null;
+                next = null;
+            }
+            else
+            {
+                previous = null;
+                next = list.First;
             }
         }
 
@@ -132,16 +140,19 @@ public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
 
         T IEnumerator<T>.Current => previous!.Value;
 
-        public void Dispose() {}                // nothing to do here really
+        public void Dispose() { }                // nothing to do here really
 
         public bool MoveNext()
         {
             if (next is null && previous is null) return false; // started empty
-            if (next is null) {
+            if (next is null)
+            {
                 previous = next;
                 next = null;
                 return false;                   // reached end after this read
-            } else {
+            }
+            else
+            {
                 previous = next;                // we set up next pointers
                 next = previous.Next;
             }
@@ -150,13 +161,16 @@ public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
 
         public void Reset()
         {
-            if (originalList.First is null) {
+            if (originalList.First is null)
+            {
                 // called with empty list 
-                this.previous = null;
-                this.next = null;
-            } else {
-                this.previous = originalList.First;
-                this.next = previous.Next;
+                previous = null;
+                next = null;
+            }
+            else
+            {
+                previous = originalList.First;
+                next = previous.Next;
             }
         }
     }
@@ -166,9 +180,9 @@ public sealed class SingleLinkedList<T> :IEnumerable<T> where T : IComparable<T>
     {
         public NodeLinkedList(U value)
         {
-            this.Value = value;
+            Value = value;
         }
         public U Value { get; }
-        public NodeLinkedList<U>? Next{ get; set; }
-    } 
+        public NodeLinkedList<U>? Next { get; set; }
+    }
 }

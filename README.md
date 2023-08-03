@@ -1,5 +1,45 @@
 # Collection of Datastructures and Algorithms
 
+Implementing some common datastructures in C-Sharp. (and copying in some `go`, `rust` or `C` examples for comparison if i alredy wrote those previously)
+- Goal is mostly to get familiar with Csharp.
+
+## Implemented are roughly
+
+
+- [x] Dynamic Array
+- [x] Stack
+- [x] Linked List (singly/double)
+- [x] Queue (linkedlist/array)
+- [x] Priority-Queue/Heap (min/max)
+- [x] Union Find (kruskals Algorithm)
+- [x] Binary Search Tree
+    - insert
+    - remove
+    - preorder, inorder, postorder, level-order, traversals
+    - 
+- [] BBST Balanced Binary Search Tree
+    - AVL tree insertion
+    - AVL tree removal
+https://www.youtube.com/watch?v=RBSGKlAvoiM&t=9631s
+- [x] Hash Table
+    - [x] separate chaining
+    - [x] open adressing
+    - [x] linear probing
+    - quadratic probing
+    - double hashing
+    - open adressing removing
+- [] Fenwick Tree range queries
+    - range queries, point updates
+- [] Suffix Array
+    - longest common prefix array
+    - finding unique substrings
+    - longest common substring problem
+- [] indexed Priority Queue
+- [] Arena allocator (should probably in c/rust unsafe)
+https://www.youtube.com/watch?v=09_LlHjoEiY&list=PLWKjhJtqVAbn5emQ3RRG8gEBqkhf_5vxD&index=14
+
+- graph theory, sorting/path algorithms etc.
+
 # Big-O Notation
 From good to bad:
 

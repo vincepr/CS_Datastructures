@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RS_DATASTRUCTURES.PriorityQueue;
+namespace src.datastructures.PriorityQueue;
 
 internal static class Example
 {
@@ -55,7 +55,7 @@ internal static class Example
                 //foreach (var item in min) Console.WriteLine(item);
             }
         }
-       
+
     }
 }
 
@@ -106,7 +106,7 @@ public class MaxPriorityQueue<TPriority, TValue> : IEnumerable<KeyValuePair<TPri
         }
     }
 
-    public TValue? Peek() => (_heap.Count > 0) ? _heap[0].Value : default;
+    public TValue? Peek() => _heap.Count > 0 ? _heap[0].Value : default;
 
     // pops the value with highest priority from our Priority queue
     public (TValue? value, bool success) Pop()
@@ -129,7 +129,8 @@ public class MaxPriorityQueue<TPriority, TValue> : IEnumerable<KeyValuePair<TPri
         int current = idx;
         int last = _heap.Count - 1;
         var (left, right) = (Left(idx), Right(idx));
-        while (left <= last) {
+        while (left <= last)
+        {
             if (left == last)
                 current = left;
             else if (Compare(left, right))
@@ -179,7 +180,7 @@ public class MinPriorityQueue<TPriority, TValue> : MaxPriorityQueue<TPriority, T
 
         public InverseComparer(Comparer<TPriority> comparer)
         {
-            this._originalComparer = comparer;
+            _originalComparer = comparer;
         }
 
         public int Compare(TPriority? x, TPriority? y)

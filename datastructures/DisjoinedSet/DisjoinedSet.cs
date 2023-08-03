@@ -11,7 +11,7 @@ using System.Threading.Tasks;
  * 
  */
 
-namespace RS_DATASTRUCTURES.DisjoinedSet
+namespace src.datastructures.DisjoinedSet
 {
     public static class Example
     {
@@ -74,7 +74,7 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
         {
             this.nrVertices = nrVertices;
             this.nrEdges = 0;
-            this.edges = new Edge[nrEdges];
+            edges = new Edge[nrEdges];
 
             for (int i = 0; i < nrEdges; i++)
             {
@@ -86,11 +86,11 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
         {
             if (from < 0 || to < 0 || from >= nrVertices || to >= nrVertices || nrEdges >= edges.Length)
                 throw new InvalidOperationException("Not allowed to add to Graph");
-            edges[nrEdges] = new Edge() { from=from, to=to };
+            edges[nrEdges] = new Edge() { from = from, to = to };
             nrEdges++;
         }
 
-        public override string ToString() => "{ " + String.Join(", ", edges) + " }";
+        public override string ToString() => "{ " + string.Join(", ", edges) + " }";
 
         /// <summary>
         /// connections between the Vertices(=Nodes)
@@ -98,7 +98,7 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
         private struct Edge
         {
             public int from, to;
-            public override string ToString() => String.Join("",this.from, "->", this.to);
+            public override string ToString() => string.Join("", from, "->", to);
         }
 
         /// <summary>
@@ -135,10 +135,10 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
             // allocate memory for nrV subsets:
             int[] parent = new int[graph.nrVertices];
             // allocate all subsets as single element sets
-            for (int i=0; i<graph.nrVertices; ++i)
+            for (int i = 0; i < graph.nrVertices; ++i)
                 parent[i] = i;
 
-            for (int i=0; i<graph.nrEdges; ++i)
+            for (int i = 0; i < graph.nrEdges; ++i)
             {
                 int x = graph.Find(parent, graph.edges[i].from);
                 int y = graph.Find(parent, graph.edges[i].to);
@@ -165,7 +165,7 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
         {
             this.nrVertices = nrVertices;
             this.nrEdges = 0;
-            this.edges = new Edge[nrEdges];
+            edges = new Edge[nrEdges];
 
             for (int i = 0; i < nrEdges; i++)
             {
@@ -181,7 +181,7 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
             nrEdges++;
         }
 
-        public override string ToString() => "{ " + String.Join(", ", edges) + " }";
+        public override string ToString() => "{ " + string.Join(", ", edges) + " }";
 
         /// <summary>
         /// connections between the Vertices(=Nodes)
@@ -189,7 +189,7 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
         private struct Edge
         {
             public int from, to;
-            public override string ToString() => String.Join("", this.from, "->", this.to);
+            public override string ToString() => string.Join("", from, "->", to);
         }
 
         /// <summary>
@@ -247,12 +247,13 @@ namespace RS_DATASTRUCTURES.DisjoinedSet
             Subset[] subsets = new Subset[nrVertices];
             // allocate all subsets as single element sets
             for (int v = 0; v < nrVertices; v++)
-                subsets[v] = new Subset(){ parent = v, rank = 0 };
+                subsets[v] = new Subset() { parent = v, rank = 0 };
             // Keep looking for a cycle
-            for (int e =0; e < nrEdges; e++){
+            for (int e = 0; e < nrEdges; e++)
+            {
                 int x = Find(subsets, edges[e].from);
                 int y = Find(subsets, edges[e].to);
-                if (x == y) 
+                if (x == y)
                     return true;
                 Union(subsets, x, y);
             }

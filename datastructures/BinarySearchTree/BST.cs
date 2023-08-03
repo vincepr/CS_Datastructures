@@ -5,14 +5,14 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RS_DATASTRUCTURES.BinarySearchTree
+namespace src.datastructures.BinarySearchTree
 {
     public class Example
     {
         public static void Run()
         {
             var bst = new BST<int>(50);
-            bst.Insert(99,2,234,45,34,5,91,102,46,48,47);
+            bst.Insert(99, 2, 234, 45, 34, 5, 91, 102, 46, 48, 47);
             //Console.WriteLine(bst.left.right.Value);
             //bst.SimplePrint();
             Console.WriteLine("~ pretty print() :");
@@ -22,25 +22,25 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
             Console.WriteLine("- Max: " + bst.MaxValue());
             Console.WriteLine("- Depth: " + bst.Depth);
 
-            Console.WriteLine("* bst.Find(101) = " + ((bst.Find(101) is null) ? "null" : bst.Find(101)));
-            Console.WriteLine("* bst.Find(34) = " + ((bst.Find(34) is null) ? "null" : bst.Find(34)));
+            Console.WriteLine("* bst.Find(101) = " + (bst.Find(101) is null ? "null" : bst.Find(101)));
+            Console.WriteLine("* bst.Find(34) = " + (bst.Find(34) is null ? "null" : bst.Find(34)));
 
             bst.Remove(50);
             bst.Remove(34);
             bst.Remove(101);
             bst.PrettyPrint();
 
-            Console.WriteLine("* bst.Find(34) = " + ((bst.Find(34) is null) ? "null" : bst.Find(34)));
+            Console.WriteLine("* bst.Find(34) = " + (bst.Find(34) is null ? "null" : bst.Find(34)));
             Console.WriteLine("---- ---- ----");
 
             Console.WriteLine("TraversePreOrder():");
-            Console.WriteLine(String.Join(", ", bst.TraversePreOrder()));
+            Console.WriteLine(string.Join(", ", bst.TraversePreOrder()));
 
             Console.WriteLine("TraverseInOrder():");
-            Console.WriteLine(String.Join(", ", bst.TraverseInOrder()));
+            Console.WriteLine(string.Join(", ", bst.TraverseInOrder()));
 
             Console.WriteLine("TraversePostOrder():");
-            Console.WriteLine(String.Join(", ", bst.TraversePostOrder()));
+            Console.WriteLine(string.Join(", ", bst.TraversePostOrder()));
         }
     }
 
@@ -53,7 +53,7 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
 
         public BST(T value, BST<T>? left = null, BST<T>? right = null)
         {
-            this.Value = value;
+            Value = value;
             this.left = left;
             this.right = right;
         }
@@ -114,15 +114,16 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
             {
                 if (right is null)
                 {
-                    this.right = new BST<T>(newVal);
+                    right = new BST<T>(newVal);
                     return;
                 }
                 right.Insert(newVal);
-            } else          // newVal < Value
+            }
+            else          // newVal < Value
             {
                 if (left is null)
                 {
-                    this.left = new BST<T>(newVal);
+                    left = new BST<T>(newVal);
                     return;
                 }
                 left.Insert(newVal);
@@ -131,8 +132,8 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
 
         public BST<T>? Find(T value)
         {
-            if (this.Value.Equals(value)) return this;
-            if (value.CompareTo(this.Value) < 0)
+            if (Value.Equals(value)) return this;
+            if (value.CompareTo(Value) < 0)
             {
                 if (left is null) return null;
                 return left.Find(value);
@@ -157,10 +158,11 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
             if (node.right is null) return node.Value;
             return MinValue(node.right);
         }
-        
-        private int GetDepth(BST<T>? parent) {
+
+        private int GetDepth(BST<T>? parent)
+        {
             if (parent is null) return 0;
-            return Math.Max( 1+GetDepth(parent.left), 1+GetDepth(parent.right));
+            return Math.Max(1 + GetDepth(parent.left), 1 + GetDepth(parent.right));
         }
 
         /// <summary>
@@ -233,22 +235,22 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
         }
 
         // helper for printTree() '+' for bigger side and '-' for smaller side
-        private static void PrintSubtree(BST<T> node, String prefix)
+        private static void PrintSubtree(BST<T> node, string prefix)
         {
             if (node.Value == null) return;
-            bool hasLeft = (node.left != null);
-            bool hasRight = (node.right != null);
+            bool hasLeft = node.left != null;
+            bool hasRight = node.right != null;
 
             if (!hasLeft && !hasRight) return;
 
             Console.Write(prefix);
-            Console.Write((hasLeft && hasRight) ? "├─" : "");
-            Console.Write((!hasLeft && hasRight) ? "└─" : "");
+            Console.Write(hasLeft && hasRight ? "├─" : "");
+            Console.Write(!hasLeft && hasRight ? "└─" : "");
 
             if (hasRight)
             {
-                bool printStrand = (hasLeft && hasRight && (node.right!.right != null || node.right.left != null));
-                String newPrefix = prefix + (printStrand ? "│ " : "  ");
+                bool printStrand = hasLeft && hasRight && (node.right!.right != null || node.right.left != null);
+                string newPrefix = prefix + (printStrand ? "│ " : "  ");
                 Console.WriteLine("+" + node.right!.Value);
                 PrintSubtree(node.right, newPrefix);
             }
@@ -263,20 +265,20 @@ namespace RS_DATASTRUCTURES.BinarySearchTree
         /* Alternative Tree Print() - more elegant but cant diff left-right */
         public IEnumerable<BST<T>> GetChildren()
         {
-            if (left is not null ) yield return left;
+            if (left is not null) yield return left;
             if (right is not null) yield return right;
         }
 
-        public void SimplePrint(string indent="", bool isLast = true) 
+        public void SimplePrint(string indent = "", bool isLast = true)
         {
             Console.Write(indent);
             Console.Write(isLast ? "└─" : "├─");
-            Console.Write(this.Value is null ? "null" : this.Value);
+            Console.Write(Value is null ? "null" : Value);
             Console.WriteLine();
 
             indent += isLast ? "  " : "│ ";
-            var lastChild = this.GetChildren().LastOrDefault();
-            foreach (var child in this.GetChildren())
+            var lastChild = GetChildren().LastOrDefault();
+            foreach (var child in GetChildren())
                 child.SimplePrint(indent, child == lastChild);
         }
     }
