@@ -122,6 +122,19 @@ public class MaxPriorityQueue<TPriority, TValue> : IEnumerable<KeyValuePair<TPri
         return (value, true);
     }
 
+    /// <summary>
+    /// pops and returns (value AND priority)
+    /// </summary>
+    /// <returns></returns>
+    public (TValue? value, TPriority? prio) PopPair()
+    {
+        if (_heap.Count < 1) return (default(TValue), default(TPriority));
+        var prio = _heap[0].Key;
+        var (value, _) = Pop();
+        return (value, prio);
+
+    }
+
     // bring heap back into heap-state after a Pop()
     // does so by potentially swapping with bigger child, moving down till bottom/no more swap
     private void HeapifyDown(int idx)
