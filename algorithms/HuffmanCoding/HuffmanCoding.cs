@@ -6,13 +6,13 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace rs_datastructures.algorithms.HuffmanCoding
+namespace src.algorithms.HuffmanCoding
 {
     internal static class Example
     {
         public static void Run()
         {
-            Console.WriteLine("--- Example: HuffmanCoding ---");
+            Console.WriteLine("--- Example: HuffmanCoding - Building a Huffman Tree ---");
             
             string input = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
             var frequencies = HuffmanCoding.Step1CountCharFrequencies(input);
@@ -23,7 +23,6 @@ namespace rs_datastructures.algorithms.HuffmanCoding
             {
 
                 HuffmanCoding.Step3IterateHuffmanTree(ref tree);
-                //Console.WriteLine(tree.Pop().ToTuple().Item1);
             }
             HuffmanCoding.printOptimalPrefixCodes(tree.Peek());
         }

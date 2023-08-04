@@ -16,10 +16,10 @@ Implementing some common datastructures in C-Sharp. (and copying in some `go`, `
     - insert
     - remove
     - preorder, inorder, postorder, level-order, traversals
-    - 
 - [] BBST Balanced Binary Search Tree
     - AVL tree insertion
     - AVL tree removal
+- [] Red-Black Tree (balanced binary tree) like Java's TreeSet
 https://www.youtube.com/watch?v=RBSGKlAvoiM&t=9631s
 - [x] Hash Table
     - [x] separate chaining
