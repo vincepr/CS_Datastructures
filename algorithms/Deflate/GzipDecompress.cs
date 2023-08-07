@@ -119,6 +119,7 @@ internal class GzipDecompress
         return "finished sucessfully";
     }
 
+
     private static string readNullTerminatedString(in BinaryReader reader)
     {
         char ch = reader.ReadChar();
@@ -133,6 +134,7 @@ internal class GzipDecompress
     private static 
 
 }
+
 
 
 
