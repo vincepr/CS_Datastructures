@@ -34,7 +34,7 @@ namespace src.algorithms.Deflate
                     nextCode++;
                 }
             }
-            if (nextCode != 1 << MAX_CODE_LENGTH)) throw new Exception("Canonical code produces illegal UNDER-full Huffman-code-tree.");
+            if (nextCode != 1 << MAX_CODE_LENGTH) throw new Exception("Canonical code produces illegal UNDER-full Huffman-code-tree.");
         }
 
 
