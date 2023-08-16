@@ -110,6 +110,8 @@ internal class GzipDecompress
                     reader.ReadBytes(2); // 2 byte checksum (that we just disregard)
                     Console.WriteLine("Flag1 FHCRC - Indicating this has a header-checksum is set.");
                 }
+                Stream underlyingStream = reader.BaseStream;
+                BitStream bitwiseStream = new BitStream(underlyingStream);
 
 
 
