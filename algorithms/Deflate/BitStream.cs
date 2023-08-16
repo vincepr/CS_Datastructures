@@ -14,10 +14,10 @@ namespace src.algorithms.Deflate
         /// - can read either starting from left or right.
         /// </summary>
         /// <param name="stream"></param>
-        BitStream(Stream stream)
+        public BitStream(Stream stream)
         {
             _stream = stream;
-            _nextIdx = 0;
+            _nextIdx = 8;   // state for freshly starting a bit next time ReadBit() is called
 
         }
 
@@ -51,10 +51,10 @@ namespace src.algorithms.Deflate
         }
 
         /// <summary>
-        /// reads numBits amount of bits and packs them into an uint
+        /// reads numBits amount of bits and packs them into an uint 
         /// </summary>
         /// <param name="numBits"></param>
-        public uint readUint(int numBits)
+        public uint ReadUint(int numBits)
         {
             if (numBits < 0 || numBits > 31)    // we assume 32bit here for now
                 throw new ArgumentOutOfRangeException("Number of bits out of range.");
@@ -65,9 +65,20 @@ namespace src.algorithms.Deflate
                 bool? bit = this.ReadBit();
                 if (bit is null) throw new InvalidCastException("Number of bits out of range");
                 if ((bool)bit) result |= (uint)1 << i;
-                else result |= (uint)0 << i;
+                else result |= (uint)0 << i;    // we could skipp since we init it as row of 0s i guess
             }
             return result;
+        }
+
+        /// <summary>
+        /// disregards bits to align freshly with byte boundary.
+        /// </summary>
+        public void AlignToByteBoundary()
+        {
+            while (_nextIdx != 8)
+            {
+                _ = ReadUint(1);
+            }
         }
 
 

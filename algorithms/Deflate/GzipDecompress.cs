@@ -111,9 +111,21 @@ internal class GzipDecompress
                     Console.WriteLine("Flag1 FHCRC - Indicating this has a header-checksum is set.");
                 }
                 Stream underlyingStream = reader.BaseStream;
-                BitStream bitwiseStream = new BitStream(underlyingStream);
-
-
+                Stream output = new MemoryStream();
+                BitStream bitwiseInStream = new BitStream(underlyingStream);
+                // try to decompress
+                try
+                {
+                    Decompressor.Decompress(bitwiseInStream, output);
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine($"Error: {e.Message}");
+                }
+                
+                dbgPrintOutStream(output);
+                
+                // TODO: check if checksum matches up
 
 
             };
@@ -121,7 +133,16 @@ internal class GzipDecompress
         return "finished sucessfully";
     }
 
-
+    private static void dbgPrintOutStream(Stream output)
+    {
+        // Debuging only till we get anything working
+        // print out contents we decoded (works for text only)
+        output.Position = 0;
+        StreamReader toStrReader = new StreamReader(output);
+        string txt = toStrReader.ReadToEnd();
+        Console.WriteLine(txt);
+    }
+    
     private static string readNullTerminatedString(in BinaryReader reader)
     {
         char ch = reader.ReadChar();
@@ -132,9 +153,6 @@ internal class GzipDecompress
         }
         return result;
     }
-
-    private static 
-
 }
 
 
