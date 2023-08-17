@@ -102,7 +102,6 @@ namespace src.algorithms.Deflate
             List<int> codeLengths = new List<int>(32);
             for (int i = 0; i < 32; i++) codeLengths.Add(5);
             return new CanonicalHuffmanCode(codeLengths.ToArray());
-
         }
     }
 }

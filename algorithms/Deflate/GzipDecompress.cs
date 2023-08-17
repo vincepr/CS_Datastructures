@@ -64,7 +64,8 @@ internal class GzipDecompress
                 // 1 byte additional-info - info about kompression
                 BitVector32 extraFlags = new BitVector32(reader.ReadByte());
                 if (extraFlags[2]) Console.WriteLine("Compression - maximal Compression and slowest algorithm.");
-                if (extraFlags[4]) Console.WriteLine("Compression - fastest Compression algorithm.");
+                else if (extraFlags[4]) Console.WriteLine("Compression - fastest Compression algorithm.");
+                else Console.WriteLine($"Compression unknown. Extra-flags: {extraFlags}");
                 // 1 byte os-file-system - info about what OS this file was compressed on
                 byte operatingSystem = reader.ReadByte();
                 string os = operatingSystem switch
@@ -95,17 +96,18 @@ internal class GzipDecompress
                 //  0x20                Reserved
                 //  0x40                Reserved
                 //  0x80                Reserved
-                if (fileFlags[0]) Console.WriteLine("Flag0 FTEXT - Indicating this is Text is set.");
-                if (fileFlags[2]) 
+                Console.WriteLine(($"{fileFlags} fileFlags[8]={fileFlags[8]}"));
+                if (fileFlags[1]) Console.WriteLine("Flag0 FTEXT - Indicating this is Text is set.");
+                if (fileFlags[4]) 
                 {
                     byte[] u16endian = reader.ReadBytes(2);
                     var bytesToSkipp = BinaryPrimitives.ReadUInt16LittleEndian(u16endian);
                     Console.WriteLine($"Flag2 FEXTRA - Indicating Extra");
                     reader.ReadBytes(bytesToSkipp);
                 }
-                if (fileFlags[3]) Console.WriteLine($"Flag3 FNAME- Indicating File name: {readNullTerminatedString(reader)}");
-                if (fileFlags[4]) Console.WriteLine($"Flag4 FCOMMENT - Indicating Comment: {readNullTerminatedString(reader)}");
-                if (fileFlags[1]) 
+                if (fileFlags[8]) Console.WriteLine($"Flag3 FNAME- Indicating File name: {readNullTerminatedString(reader)}");
+                if (fileFlags[16]) Console.WriteLine($"Flag4 FCOMMENT - Indicating Comment: {readNullTerminatedString(reader)}");
+                if (fileFlags[2]) 
                 {
                     reader.ReadBytes(2); // 2 byte checksum (that we just disregard)
                     Console.WriteLine("Flag1 FHCRC - Indicating this has a header-checksum is set.");
@@ -150,6 +152,7 @@ internal class GzipDecompress
         while (ch != '\0')
         {
             result += ch;
+            ch = reader.ReadChar();
         }
         return result;
     }
