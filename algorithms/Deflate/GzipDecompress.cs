@@ -25,6 +25,7 @@ internal class GzipDecompress
     {
         if (args.Length != 2) return "Usage: GzipDecompress Inputfile.gz Outputfile";
         string inPath = args[0];
+        string outPath = args[1];
 
         if (!File.Exists(inPath) || Directory.Exists(inPath)) return $"Input-File {inPath} not found!";
         
@@ -120,13 +121,13 @@ internal class GzipDecompress
                 int crc = readLittleEndianInt32(reader);
                 int size = readLittleEndianInt32(reader);
 
-                if (size != output.Length)
-                    return $"Size mismatched. expected: {size} got: {output.Length}";
+                //if (size != output.Length)
+                //    return $"Size mismatched. expected: {size} got: {output.Length}";
                 // TODO: check if calculated-crc == read crc-checksum matches up
                 
                 
                 dbgPrintOutStream(output);
-                dbgWriteStreamToFile(output, "C:\\Dateien\\Screenshot 2023-08-07 140912.png");
+                dbgWriteStreamToFile(output, outPath);
                 // TODO: check if checksum matches up
 
 
