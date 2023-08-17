@@ -14,7 +14,7 @@ namespace src.algorithms.Deflate
         private const int MaxCodeLength = 15;
         private readonly Dictionary<uint, uint> _bitToSymbol = new Dictionary<uint, uint>();
 
-        public CanonicalHuffmanCode(in int[] codeLengths)
+        public CanonicalHuffmanCode(in uint[] codeLengths)
         {
             // check if params are of valid state:
             foreach( var l in codeLengths)

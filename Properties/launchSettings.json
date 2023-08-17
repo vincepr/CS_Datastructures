@@ -2,7 +2,7 @@
   "profiles": {
     "src": {
       "commandName": "Project",
-      "commandLineArgs": "C:\\Users\\probstv\\source\\repos\\vincepr\\Datastructures\\algorithms\\Deflate\\test.png.gz outfile.txt"
+      "commandLineArgs": "C:\\Users\\probstv\\source\\repos\\vincepr\\Datastructures\\algorithms\\Deflate\\test.txt.gz outfile.txt"
     }
   }
 }

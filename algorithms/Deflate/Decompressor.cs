@@ -113,9 +113,35 @@ namespace src.algorithms.Deflate
             else throw new InvalidDataException("Reserved length symbol: " + sym);
         }
 
+        /// <summary>
+        /// reads bits from the input stream to build the huffman-code that will be used for the following block
+        /// </summary>
+        /// <returns></returns>
         private  (CanonicalHuffmanCode lenCode, CanonicalHuffmanCode distCode) readHuffmanCodes()
         {
+            uint numLenCodes = this._input.ReadUint(5) + 257;   // hlit + 257
+            uint numDisCodes = this._input.ReadUint(5) + 1;     // hdist + 1
+
+            // read length the huffman-code takes in the stream
+            uint numCodeLenCodes = this._input.ReadUint(4) + 4; // hclen + 4
+            List<uint> codeLenCodeLen = new();
+            // fill in fixed values:
+            for (int i = 0; i < 19; i++)
+                codeLenCodeLen.Add(0);
+            codeLenCodeLen[16] = this._input.ReadUint(3);
+            codeLenCodeLen[17] = this._input.ReadUint(3);
+            codeLenCodeLen[18] = this._input.ReadUint(3);
+            codeLenCodeLen[0] = this._input.ReadUint(3);
+            for (int i=0; i<numCodeLenCodes-4; i++)
+            {
+                int j = (i % 2 == 0) ? (8 + i / 2) : (7 - i / 2);
+                codeLenCodeLen[j] = this._input.ReadUint(3);
+            }
+            var codeLenCode = new CanonicalHuffmanCode(codeLenCodeLen.ToArray());
+
             throw new NotImplementedException();
+
+
         }
 
         private uint decodeDistance(uint sym)
@@ -136,18 +162,18 @@ namespace src.algorithms.Deflate
         // BTYPE==1 -> static values
         private static CanonicalHuffmanCode makeFixedLenCode()
         {
-            List<int> codeLengths = new List<int>(288);
-            for (int i=0; i<144; i++) codeLengths.Add(8);
-            for (int i=0; i<112; i++) codeLengths.Add(9);
-            for (int i=0; i<24; i++) codeLengths.Add(7);
-            for (int i=0; i<8; i++) codeLengths.Add(8);
+            List<uint> codeLengths = new List<uint>(288);
+            for (uint i =0; i<144; i++) codeLengths.Add(8);
+            for (uint i =0; i<112; i++) codeLengths.Add(9);
+            for (uint i =0; i<24; i++) codeLengths.Add(7);
+            for (uint i =0; i<8; i++) codeLengths.Add(8);
             return new CanonicalHuffmanCode(codeLengths.ToArray());
         }
 
         private static CanonicalHuffmanCode makeFixedDistCode()
         {
-            List<int> codeLengths = new List<int>(32);
-            for (int i = 0; i < 32; i++) codeLengths.Add(5);
+            List<uint> codeLengths = new List<uint>(32);
+            for (uint i = 0; i < 32; i++) codeLengths.Add(5);
             return new CanonicalHuffmanCode(codeLengths.ToArray());
         }
     }
