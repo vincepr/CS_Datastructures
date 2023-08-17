@@ -10,7 +10,6 @@
 
 //src.algorithms.HuffmanCoding.Example.Run();
 
-Console.WriteLine(args.Length);
 string result = src.algorithms.Deflate.GzipDecompress.GzipRun(args);
 Console.WriteLine(result);
 

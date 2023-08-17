@@ -27,17 +27,7 @@ internal class GzipDecompress
         string inPath = args[0];
 
         if (!File.Exists(inPath) || Directory.Exists(inPath)) return $"Input-File {inPath} not found!";
-
-        const int bufferSize = 16 * 1024;
-
-        var options = new FileStreamOptions
-        {
-            Mode = FileMode.Open,
-            Access = FileAccess.Read,
-            BufferSize = bufferSize,
-            // PreallocationSize = bufferSize,
-        };
-
+        
         using (var stream = File.OpenRead(inPath))
         {
             // StreamReader vs BinaryReader here?
@@ -58,8 +48,9 @@ internal class GzipDecompress
                 BitVector32 fileFlags = new BitVector32(reader.ReadByte());    //reader.ReadInt32() any difference?;
                 if (fileFlags[5] || fileFlags[6] || fileFlags[7]) return "Reserved flags are set. Must be 0";
                 // 4 byte unixtimestamp - last modified - time is in endian byte array -> we reverse it before casting it
-                int modificationTime = BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
-                if (modificationTime != 0) Console.WriteLine($"Last modified - {modificationTime}");
+                int unixTime = readLittleEndianInt32(reader); //BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
+                var dateTimeLastModification = DateTimeOffset.FromUnixTimeSeconds(unixTime);
+                if (unixTime != 0) Console.WriteLine($"Last modified - {dateTimeLastModification}");
                 else Console.WriteLine("last modified - N/A");
                 // 1 byte additional-info - info about kompression
                 BitVector32 extraFlags = new BitVector32(reader.ReadByte());
@@ -96,7 +87,6 @@ internal class GzipDecompress
                 //  0x20                Reserved
                 //  0x40                Reserved
                 //  0x80                Reserved
-                Console.WriteLine(($"{fileFlags} fileFlags[8]={fileFlags[8]}"));
                 if (fileFlags[1]) Console.WriteLine("Flag0 FTEXT - Indicating this is Text is set.");
                 if (fileFlags[4]) 
                 {
@@ -106,6 +96,7 @@ internal class GzipDecompress
                     reader.ReadBytes(bytesToSkipp);
                 }
                 if (fileFlags[8]) Console.WriteLine($"Flag3 FNAME- Indicating File name: {readNullTerminatedString(reader)}");
+                // TODO: check if fileFlags[16] is set properly
                 if (fileFlags[16]) Console.WriteLine($"Flag4 FCOMMENT - Indicating Comment: {readNullTerminatedString(reader)}");
                 if (fileFlags[2]) 
                 {
@@ -115,6 +106,7 @@ internal class GzipDecompress
                 Stream underlyingStream = reader.BaseStream;
                 Stream output = new MemoryStream();
                 BitStream bitwiseInStream = new BitStream(underlyingStream);
+                
                 // try to decompress
                 try
                 {
@@ -124,10 +116,17 @@ internal class GzipDecompress
                 {
                     Console.Error.WriteLine($"Error: {e.Message}");
                 }
+                // read footer and check checksumm
+                int crc = readLittleEndianInt32(reader);
+                int size = readLittleEndianInt32(reader);
+
+                if (size != output.Length)
+                    return $"Size mismatched. expected: {size} got: {output.Length}";
+                // TODO: check if calculated-crc == read crc-checksum matches up
+                
                 
                 dbgPrintOutStream(output);
                 
-                // TODO: check if checksum matches up
 
 
             };
@@ -135,6 +134,10 @@ internal class GzipDecompress
         return "finished sucessfully";
     }
 
+    private static int readLittleEndianInt32(BinaryReader reader)
+    {
+        return BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
+    }
     private static void dbgPrintOutStream(Stream output)
     {
         // Debuging only till we get anything working
