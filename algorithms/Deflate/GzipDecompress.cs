@@ -126,12 +126,23 @@ internal class GzipDecompress
                 
                 
                 dbgPrintOutStream(output);
-                
+                dbgWriteStreamToFile(output, "C:\\Dateien\\Screenshot 2023-08-07 140912.png");
+                // TODO: check if checksum matches up
 
 
             };
         }
         return "finished sucessfully";
+    }
+
+    private static void dbgWriteStreamToFile(Stream output, string newFilePath)
+    {
+        using (var fileStream = File.Create(newFilePath))
+        {
+            output.Seek(0, SeekOrigin.Begin);
+            output.CopyTo(fileStream);
+        }
+
     }
 
     private static int readLittleEndianInt32(BinaryReader reader)
