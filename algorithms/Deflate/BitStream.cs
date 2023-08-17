@@ -24,9 +24,7 @@ namespace src.algorithms.Deflate
         private Stream _stream;
         private int _nextIdx;
         private byte _currentByte;
-
-    
-
+           
         /// <summary>
         /// Reads one BIT (not byte) null when empty
         /// 
@@ -80,7 +78,5 @@ namespace src.algorithms.Deflate
                 _ = ReadUint(1);
             }
         }
-
-
     }
 }

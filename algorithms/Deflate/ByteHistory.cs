@@ -63,7 +63,6 @@ namespace src.algorithms.Deflate
                 output.Write(b);
                 append(by);
             }
-
         }
     }
 }

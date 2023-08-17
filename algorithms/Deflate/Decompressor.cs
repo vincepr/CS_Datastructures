@@ -45,7 +45,7 @@ namespace src.algorithms.Deflate
                 // Header Block
                 isFinal = input.ReadUint(1) != 0;       // BFINAL
                 uint type = input.ReadUint(2);          // BTYPE
-
+                Console.WriteLine("type: " + type);
                 // decompress rest of the block depending on type
                 if (type == 0)
                 {
@@ -102,7 +102,6 @@ namespace src.algorithms.Deflate
             List<int> codeLengths = new List<int>(32);
             for (int i = 0; i < 32; i++) codeLengths.Add(5);
             return new CanonicalHuffmanCode(codeLengths.ToArray());
-
         }
     }
 }
