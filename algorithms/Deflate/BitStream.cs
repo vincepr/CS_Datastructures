@@ -52,7 +52,7 @@ namespace src.algorithms.Deflate
         /// reads numBits amount of bits and packs them into an uint 
         /// </summary>
         /// <param name="numBits"></param>
-        public uint ReadUint(int numBits)
+        public uint ReadUint(uint numBits)
         {
             if (numBits < 0 || numBits > 31)    // we assume 32bit here for now
                 throw new ArgumentOutOfRangeException("Number of bits out of range.");

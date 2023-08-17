@@ -74,14 +74,61 @@ namespace src.algorithms.Deflate
             throw new NotImplementedException();
         }
 
-        private void decompressHuffmanBlock(CanonicalHuffmanCode lenCode, CanonicalHuffmanCode distCode)
+        private void decompressHuffmanBlock(CanonicalHuffmanCode lenCode, CanonicalHuffmanCode? distCode)
         {
-            throw new NotImplementedException();
+            while (true)
+            {
+                uint sym = lenCode.DecodeNextSymbol(this._input);
+                if (sym < 256)
+                {
+                    // literal byte
+                    this._output.WriteByte((byte)sym);
+                    this._history.append((byte)sym);
+                } else
+                {
+                    // length and distance used for copying
+                    uint run = decodeRunLength(sym);
+                    if (!(3 <= run && run <= 258)) throw new Exception("Invalid run length");
+                    if (distCode is null) throw new Exception("Length symbol encountered with empty distance code.");
+                    uint distSym = distCode.DecodeNextSymbol(this._input);
+                    uint dist = this.decodeDistance(distSym);
+                    if (!(1 <= dist && dist <= 32768)) throw new Exception("Invalid distance");
+                    this._history.copy(dist, run, this._output);
+
+                }
+            }
+        }
+
+        private uint decodeRunLength(uint sym)
+        {
+            if (!(257 <= sym && sym <= 287))
+                throw new ArgumentOutOfRangeException(nameof(sym), "Invalid run length symbol");
+            if (sym <= 264) return sym - 254;
+            else if (sym <= 284)
+            {
+                uint numExtraBits = (sym - 261) / 4;
+                return (((sym - 265) % 4 + 4) << (int)numExtraBits) + 3 + _input.ReadUint(numExtraBits);
+            }
+            else if (sym == 285) return 258;
+            else throw new InvalidDataException("Reserved length symbol: " + sym);
         }
 
         private  (CanonicalHuffmanCode lenCode, CanonicalHuffmanCode distCode) readHuffmanCodes()
         {
             throw new NotImplementedException();
+        }
+
+        private uint decodeDistance(uint sym)
+        {
+            if (!(0 <= sym && sym <= 31)) 
+                throw new ArgumentOutOfRangeException(nameof(sym), "Invalid run length symbol");
+            if (sym <= 3) return sym + 1;
+            else if (sym <= 29)
+            {
+                uint numExtraBits = sym / 2 - 1;
+                return ((sym % 2 +2) << (int)numExtraBits) + 1 + _input.ReadUint(numExtraBits);
+            }
+            else throw new InvalidDataException("Reserved length symbol: " + sym);
         }
         
         

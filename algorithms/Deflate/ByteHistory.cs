@@ -10,18 +10,18 @@ namespace src.algorithms.Deflate
     internal class ByteHistory
     {
         /// number of bytes written
-        private int _length;
+        private uint _length;
         /// circular ring buffer of bytes. (next input will overwrite oldest input when at capacity)
         private byte[] _data;
         /// index of the next byte to write to
-        private int _index;
+        private uint _index;
 
         /// <summary>
         /// Constructs a ring buffered array of bytes of specified size in bytes.
         /// </summary>
         /// <param name="size"></param>
         /// <exception cref="ArgumentOutOfRangeException"> is size is not positive</exception>
-        public ByteHistory(int size)
+        public ByteHistory(uint size)
         {
             if (size < 1) throw new ArgumentOutOfRangeException("size must be positive");
             _length = size;
@@ -38,7 +38,7 @@ namespace src.algorithms.Deflate
         {
             if (0 > _index || _index >= _data.Length) throw new InvalidOperationException("Unreachable state in ByteHistory.append()");
             _data[_index] = b;
-            _index = (_index + 1) % _data.Length;
+            _index = (_index + 1) % (uint)_data.Length;
             if (_length < _data.Length) _length++;
         }
 
@@ -50,16 +50,16 @@ namespace src.algorithms.Deflate
         /// <param name="output"></param>
         /// <exception cref="ArgumentOutOfRangeException"></exception>
         /// <exception cref="InvalidOperationException"></exception>
-        public void copy(int dist, int len, Stream output)
+        public void copy(uint dist, uint len, Stream output)
         {
             if (len < 0 || dist < 1 || dist > _length) throw new ArgumentOutOfRangeException("Invalid length or distance");
-            int readIdx = (_index - dist + _data.Length) % _data.Length;
+            uint readIdx = (_index - dist + (uint)_data.Length) % (uint)_data.Length;
             if (0 > readIdx || readIdx >= _data.Length) throw new InvalidOperationException("Unreachable state in ByteHistory.copy()");
             for (int i=0; i<len; i++)
             {
                 var by = _data[readIdx];
                 ReadOnlySpan<byte> b = new byte[] { _data[readIdx] };
-                readIdx = (readIdx + 1) % _data.Length;
+                readIdx = (readIdx + 1) % (uint)_data.Length;
                 output.Write(b);
                 append(by);
             }
