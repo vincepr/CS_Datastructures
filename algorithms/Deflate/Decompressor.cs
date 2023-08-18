@@ -95,6 +95,7 @@ namespace src.algorithms.Deflate
             while (true)
             {
                 uint sym = lenCode.DecodeNextSymbol(this._input);
+                if (sym == 256) break;  // reached end of this block
                 if (sym < 256)
                 {
                     // literal byte
