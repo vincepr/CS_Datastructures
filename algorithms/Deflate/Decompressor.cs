@@ -101,7 +101,8 @@ namespace src.algorithms.Deflate
 
         private uint decodeRunLength(uint sym)
         {
-            if (!(257 <= sym && sym <= 287))
+            Console.WriteLine(sym);
+            if (257 > sym || sym > 287)
                 throw new ArgumentOutOfRangeException(nameof(sym), "Invalid run length symbol");
             if (sym <= 264) return sym - 254;
             else if (sym <= 284)
@@ -171,7 +172,7 @@ namespace src.algorithms.Deflate
                     uint end = codeLensIdx + runLen;
                     if (end > codeLens.Length)
                         throw new InvalidDataException("Run exceeds numer of codes.");
-                    Array.Fill(codeLens, codeLensIdx, (int)end, (int)runValue);
+                    Array.Fill(codeLens, runValue, (int)codeLensIdx, (int)(end- codeLensIdx) );
                     codeLensIdx = end;
                 }
             }
