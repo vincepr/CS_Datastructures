@@ -39,6 +39,7 @@ namespace src.algorithms.Deflate
             }
             if (nextCode != 1 << MaxCodeLength) throw new Exception("Canonical code produces illegal UNDER-full Huffman-code-tree.");
         }
+
         /// <summary>
         /// Keep reading one bit at the time from right side
         /// - until match is found in the Map of Huffmancodes.

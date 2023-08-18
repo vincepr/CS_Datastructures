@@ -107,16 +107,17 @@ internal class GzipDecompress
                 Stream underlyingStream = reader.BaseStream;
                 Stream output = new MemoryStream();
                 BitStream bitwiseInStream = new BitStream(underlyingStream);
-                
+
                 // try to decompress
-                try
-                {
-                    Decompressor.Decompress(bitwiseInStream, output);
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine($"Error: {e.Message}");
-                }
+                Decompressor.Decompress(bitwiseInStream, output);
+                //try
+                //{
+                //    Decompressor.Decompress(bitwiseInStream, output);
+                //}
+                //catch (Exception e)
+                //{
+                //    Console.Error.WriteLine($"Error: {e.Message}");
+                //}
                 // read footer and check checksumm
                 int crc = readLittleEndianInt32(reader);
                 int size = readLittleEndianInt32(reader);

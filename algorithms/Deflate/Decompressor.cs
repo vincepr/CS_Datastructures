@@ -117,7 +117,7 @@ namespace src.algorithms.Deflate
         /// reads bits from the input stream to build the huffman-code that will be used for the following block
         /// </summary>
         /// <returns></returns>
-        private  (CanonicalHuffmanCode lenCode, CanonicalHuffmanCode distCode) readHuffmanCodes()
+        private  (CanonicalHuffmanCode lenCode, CanonicalHuffmanCode? distCode) readHuffmanCodes()
         {
             uint numLenCodes = this._input.ReadUint(5) + 257;   // hlit + 257
             uint numDisCodes = this._input.ReadUint(5) + 1;     // hdist + 1
@@ -139,9 +139,74 @@ namespace src.algorithms.Deflate
             }
             var codeLenCode = new CanonicalHuffmanCode(codeLenCodeLen.ToArray());
 
-            throw new NotImplementedException();
+            // Read the main code lengths
+            uint[] codeLens = new uint[numLenCodes + numDisCodes];
+            for (uint codeLensIdx=0; codeLensIdx < codeLens.Length;)
+            {
+                uint sym = codeLenCode.DecodeNextSymbol(_input);
+                if (0 <= sym && sym <= 15)
+                {
+                    codeLens[codeLensIdx] = sym;
+                    codeLensIdx++;
+                } else
+                {
+                    uint runLen;
+                    uint runValue = 0;
+                    if (sym == 16)
+                    {
+                        if (codeLensIdx == 0)
+                            throw new FormatException("No code length value to copy.");
+                        runLen = _input.ReadUint(2) + 3;
+                        runValue = codeLens[codeLensIdx - 1];
+                    }
+                    else if (sym == 17)
+                    {
+                        runLen = _input.ReadUint(3) + 3;
+                    }
+                    else if (sym == 18)
+                    {
+                        runLen = _input.ReadUint(7) + 11;
+                    }
+                    else throw new InvalidDataException("Symbol out allowed of range.");
+                    uint end = codeLensIdx + runLen;
+                    if (end > codeLens.Length)
+                        throw new InvalidDataException("Run exceeds numer of codes.");
+                    Array.Fill(codeLens, codeLensIdx, (int)end, (int)runValue);
+                    codeLensIdx = end;
+                }
+            }
 
+            // create literal-length-code-tree
+            uint[] lenCodeLen = codeLens[0 .. (int)numLenCodes];
+            if (lenCodeLen[256] == 0)
+                throw new InvalidDataException("End of block symbol has zero code length.");
+            CanonicalHuffmanCode huffLenCode = new CanonicalHuffmanCode(lenCodeLen);
 
+            //create distance-code-tree
+            uint[] distCodesLen = codeLens[(int)numLenCodes .. codeLens.Length];
+            CanonicalHuffmanCode? huffDistCode;
+            if (distCodesLen.Length == 1 && distCodesLen[0] == 0)
+                huffDistCode = null;    // no distance code -> the block will be all literal symbals
+            else
+            {
+                // build statistics
+                uint oneCount = 0;
+                uint otherPositiveCOunt = 0;
+                foreach (var x in distCodesLen)
+                {
+                    if (x == 1) oneCount++;
+                    else if (x > 1) otherPositiveCOunt++;
+                }
+                // handle case: only one distance code is defined
+                if (oneCount ==1 && otherPositiveCOunt == 0)
+                {
+                    // we need to fill dummy data in to make a complete huffman-tree (tree MUST always be valid)
+                    // TODO...
+                }
+                huffDistCode = new CanonicalHuffmanCode(distCodesLen);
+            }
+
+            return (huffLenCode, huffDistCode);
         }
 
         private uint decodeDistance(uint sym)
