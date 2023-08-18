@@ -17,6 +17,7 @@ using System.Xml.Linq;
 using File = System.IO.File;
 using System.Buffers.Binary;
 
+
 namespace src.algorithms.Deflate;
 
 /// <summary>
@@ -62,10 +63,11 @@ internal class GzipDecompress
                     int size = readLittleEndianInt32(reader);
                     if (size != output.Length)
                         return $"Error: Size after decompression mismatched. expected: {size} got: {output.Length}";
-                    // TODO: check if calculated-crc == read crc-checksum matches up
+                    // Not-implemented: checking if calculated-crc == read crc-checksum matches up
+                    // var crc32 = new Crc32(); is in some external-package -> we skipp that for now
                     
                     // we write out the decompressed bytes to a file
-                    dbgWriteStreamToFile(output, outPath);
+                    writeStreamToFile(output, outPath);
                     // dbgPrintOutStream(output);
                 }
                 catch (Exception e)
@@ -78,7 +80,8 @@ internal class GzipDecompress
     }
 
     /// <summary>
-    /// 
+    /// Header info of various optional fields that must be read in order.
+    /// We just print out encountered Headers like last-modified etc...
     /// </summary>
     /// <exception cref="InvalidDataException"></exception>
     private static void readHeaderInfo(BinaryReader reader)
@@ -88,7 +91,7 @@ internal class GzipDecompress
                 if (!(magicNr == (UInt16)0x1F8B || magicNr == (UInt16)35615)) throw new InvalidDataException("Invalid gzip magic number.");
                 // 1 byte compression-method -  Deflate = 8 for deflate
                 byte compressionMethod = reader.ReadByte();
-                if (compressionMethod != (Byte)8) throw new InvalidDataException( $"Unsupported compression method. Expected 8 got: [{compressionMethod}].");
+                if (compressionMethod != (byte)8) throw new InvalidDataException( $"Unsupported compression method. Expected 8 got: [{compressionMethod}].");
                 // 1 byte special-info - reserved-bits must be 0
                 BitVector32 fileFlags = new BitVector32(reader.ReadByte());    //reader.ReadInt32() any difference?;
                 if (fileFlags[5] || fileFlags[6] || fileFlags[7]) throw new InvalidDataException( "Reserved flags are set. Must be 0");
@@ -154,7 +157,7 @@ internal class GzipDecompress
      *          HELPERS
      */
     
-    private static void dbgWriteStreamToFile(Stream output, string newFilePath)
+    private static void writeStreamToFile(Stream output, string newFilePath)
     {
         using (var fileStream = File.Create(newFilePath))
         {
