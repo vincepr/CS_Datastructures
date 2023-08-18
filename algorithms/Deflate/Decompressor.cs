@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace src.algorithms.Deflate
 {
-    // constants for static huffman codes (btype==1)
-    
-    
     internal class Decompressor
     {
+        // constants these are static -> only get calculated once. (represent a 'default'-kind of huffmantree)
         private static CanonicalHuffmanCode FIXED_LENGTH_CODE = Decompressor.makeFixedLenCode();
         private static CanonicalHuffmanCode FIXED_DIST_CODE = Decompressor.makeFixedDistCode();
         
@@ -21,7 +19,7 @@ namespace src.algorithms.Deflate
         private ByteHistory _history;
 
         /// <summary>
-        /// starts the decompression process for data in the inputstream and writes it to the output stream.
+        /// starts the decompression process for data in the input stream and writes it to the output stream.
         /// </summary>
         /// <param name="input"></param>
         /// <param name="output"></param>
@@ -31,7 +29,7 @@ namespace src.algorithms.Deflate
         }
 
         /// <summary>
-        /// Constructor, that immediatly starts the decompressoin.
+        /// Constructor, that immediately starts the decompression.
         /// </summary>
         private Decompressor(BitStream input, Stream output)
         {
@@ -47,7 +45,6 @@ namespace src.algorithms.Deflate
                 // Header Block
                 isFinal = input.ReadUint(1) != 0;       // BFINAL
                 uint type = input.ReadUint(2);          // BTYPE
-                Console.WriteLine("type: " + type);
                 // decompress rest of the block depending on type
                 if (type == 0)
                 {
@@ -73,7 +70,7 @@ namespace src.algorithms.Deflate
 
         private void decompressUncompressedBlock()
         {
-            // discard bits to allign to clean byte boundary
+            // discard bits to align to clean byte boundary
             _input.AlignToByteBoundary();
 
             // read length of block:
@@ -205,7 +202,7 @@ namespace src.algorithms.Deflate
             uint[] distCodesLen = codeLens[(int)numLenCodes .. codeLens.Length];
             CanonicalHuffmanCode? huffDistCode;
             if (distCodesLen.Length == 1 && distCodesLen[0] == 0)
-                huffDistCode = null;    // no distance code -> the block will be all literal symbals
+                huffDistCode = null;    // no distance code -> the block will be all literal symbols
             else
             {
                 // build statistics

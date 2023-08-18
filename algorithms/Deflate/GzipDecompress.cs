@@ -19,8 +19,16 @@ using System.Buffers.Binary;
 
 namespace src.algorithms.Deflate;
 
+/// <summary>
+/// usage is GzipDecompress.GzipRun(cmdLineArgs);
+/// outputs string with error-/success-info
+///
+/// Along the DEFLATE Compressed Data Format Specification version 1.3
+/// as described in **RFC 1951**
+/// </summary>
 internal class GzipDecompress
 {
+    private GzipDecompress() {}
     public static string GzipRun(string[] args)
     {
         if (args.Length != 2) return "Usage: GzipDecompress Inputfile.gz Outputfile";
@@ -34,15 +42,56 @@ internal class GzipDecompress
             // StreamReader vs BinaryReader here?
             using (var reader = new BinaryReader(stream))
             {
-                // 2 bytes initialisation - gzip magic number: 
+
+                Stream output;
+                try
+                {
+                    // first we must read and consume header-info of variable length
+                    readHeaderInfo(reader);
+                    
+                    // we wrap the underlyingStream into our own BitStream that reads 1 BIT at a time.
+                    Stream underlyingStream = reader.BaseStream;
+                    output = new MemoryStream();
+                    BitStream bitwiseInStream = new BitStream(underlyingStream);
+                    
+                    // start the decompression process
+                    Decompressor.Decompress(bitwiseInStream, output);
+                    
+                    // read checksums
+                    int crc = readLittleEndianInt32(reader);
+                    int size = readLittleEndianInt32(reader);
+                    if (size != output.Length)
+                        return $"Error: Size after decompression mismatched. expected: {size} got: {output.Length}";
+                    // TODO: check if calculated-crc == read crc-checksum matches up
+                    
+                    // we write out the decompressed bytes to a file
+                    dbgWriteStreamToFile(output, outPath);
+                    // dbgPrintOutStream(output);
+                }
+                catch (Exception e)
+                {
+                    return $"Error: {e.Message}";
+                }
+            };
+        }
+        return "Successfully decompressed "+outPath;
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <exception cref="InvalidDataException"></exception>
+    private static void readHeaderInfo(BinaryReader reader)
+    {
+        // 2 bytes initialisation - gzip magic number: 
                 var magicNr = reader.ReadUInt16();
-                if (!(magicNr == (UInt16)0x1F8B || magicNr == (UInt16)35615)) return "Invalid gzip magic number.";
+                if (!(magicNr == (UInt16)0x1F8B || magicNr == (UInt16)35615)) throw new InvalidDataException("Invalid gzip magic number.");
                 // 1 byte compression-method -  Deflate = 8 for deflate
                 byte compressionMethod = reader.ReadByte();
-                if (compressionMethod != (Byte)8) return $"Unsupported compression method. Expected 8 got: [{compressionMethod}].";
+                if (compressionMethod != (Byte)8) throw new InvalidDataException( $"Unsupported compression method. Expected 8 got: [{compressionMethod}].");
                 // 1 byte special-info - reserved-bits must be 0
                 BitVector32 fileFlags = new BitVector32(reader.ReadByte());    //reader.ReadInt32() any difference?;
-                if (fileFlags[5] || fileFlags[6] || fileFlags[7]) return "Reserved flags are set. Must be 0";
+                if (fileFlags[5] || fileFlags[6] || fileFlags[7]) throw new InvalidDataException( "Reserved flags are set. Must be 0");
                 // 4 byte unixtimestamp - last modified - time is in endian byte array -> we reverse it before casting it
                 int unixTime = readLittleEndianInt32(reader); //BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
                 var dateTimeLastModification = DateTimeOffset.FromUnixTimeSeconds(unixTime);
@@ -75,6 +124,7 @@ internal class GzipDecompress
                     _ => "Could not match OperatingSystem Identifier",
                 };
                 Console.WriteLine($"File-System-Info - value: {operatingSystem} => {os}");
+                
                 // next come optinal flags, denoted in fileFlags.
                 //  0x01    FTEXT       file is probably ASCII text.
                 //  0x04    FEXTRA      The file contains extra fields
@@ -86,47 +136,24 @@ internal class GzipDecompress
                 if (fileFlags[1]) Console.WriteLine("Flag0 FTEXT - Indicating this is Text is set.");
                 if (fileFlags[4]) 
                 {
-                    byte[] u16endian = reader.ReadBytes(2);
-                    var bytesToSkipp = BinaryPrimitives.ReadUInt16LittleEndian(u16endian);
+                    byte[] u16Endian = reader.ReadBytes(2);
+                    var bytesToSkipp = BinaryPrimitives.ReadUInt16LittleEndian(u16Endian);
                     Console.WriteLine($"Flag2 FEXTRA - Indicating Extra");
                     reader.ReadBytes(bytesToSkipp);
                 }
                 if (fileFlags[8]) Console.WriteLine($"Flag3 FNAME- Indicating File name: {readNullTerminatedString(reader)}");
-                // TODO: check if fileFlags[16] is set properly
                 if (fileFlags[16]) Console.WriteLine($"Flag4 FCOMMENT - Indicating Comment: {readNullTerminatedString(reader)}");
                 if (fileFlags[2]) 
                 {
                     reader.ReadBytes(2); // 2 byte checksum (that we just disregard)
                     Console.WriteLine("Flag1 FHCRC - Indicating this has a header-checksum is set.");
                 }
-                Stream underlyingStream = reader.BaseStream;
-                Stream output = new MemoryStream();
-                BitStream bitwiseInStream = new BitStream(underlyingStream);
-
-                // try to decompress
-                try
-                {
-                    Decompressor.Decompress(bitwiseInStream, output);
-                }
-                catch (Exception e)
-                {
-                    Console.Error.WriteLine($"Error: {e.Message}");
-                }
-                // read footer and check checksumm
-                int crc = readLittleEndianInt32(reader);
-                int size = readLittleEndianInt32(reader);
-
-                //if (size != output.Length)
-                //    return $"Size mismatched. expected: {size} got: {output.Length}";
-                // TODO: check if calculated-crc == read crc-checksum matches up
-                
-                //dbgPrintOutStream(output);
-                dbgWriteStreamToFile(output, outPath);
-            };
-        }
-        return "finished successfully";
     }
 
+    /*
+     *          HELPERS
+     */
+    
     private static void dbgWriteStreamToFile(Stream output, string newFilePath)
     {
         using (var fileStream = File.Create(newFilePath))
@@ -136,15 +163,10 @@ internal class GzipDecompress
         }
 
     }
-
-    private static int readLittleEndianInt32(BinaryReader reader)
-    {
-        return BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
-    }
     
+    // Debugging only till we get anything working
     private static void dbgPrintOutStream(Stream output)
     {
-        // Debuging only till we get anything working
         // print out contents we decoded (works for text only)
         output.Position = 0;
         StreamReader toStrReader = new StreamReader(output);
@@ -152,6 +174,18 @@ internal class GzipDecompress
         Console.WriteLine(txt);
     }
     
+    /// <summary>
+    /// reads 32 bit in reverse-order (littleEndian) and interprets them as a int32
+    /// </summary>
+    private static int readLittleEndianInt32(BinaryReader reader)
+    {
+        return BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
+    }
+    
+    /// <summary>
+    /// keep reading chars till Null-terminator is found.
+    /// </summary>
+    /// <returns> string it just fully consumed. (minus consumed Null-terminator)</returns>
     private static string readNullTerminatedString(in BinaryReader reader)
     {
         char ch = reader.ReadChar();

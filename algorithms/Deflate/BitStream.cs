@@ -6,14 +6,13 @@ using System.Threading.Tasks;
 
 namespace src.algorithms.Deflate
 {
+    /// <summary>
+    /// Bit input stream, wraps around a normal stream but instead of bytes it can read single bits.
+    ///
+    /// - can read either starting from left or right.
+    /// </summary>
     internal class BitStream
     {
-        /// <summary>
-        /// Bit input stream, wrapps arround a normal stream but instead of bytes it can read single bits.
-        ///
-        /// - can read either starting from left or right.
-        /// </summary>
-        /// <param name="stream"></param>
         public BitStream(Stream stream)
         {
             _stream = stream;
@@ -54,16 +53,16 @@ namespace src.algorithms.Deflate
         /// <param name="numBits"></param>
         public uint ReadUint(uint numBits)
         {
-            if (numBits < 0 || numBits > 31)    // we assume 32bit here for now
-                throw new ArgumentOutOfRangeException("Number of bits out of range.");
+            if (numBits < 0 || numBits > 32)    // we assume 32bit here for now
+                throw new InvalidDataException("Number of bits out of range.");
 
             uint result = 0;
             for (int i=0; i<numBits; i++)
             {
                 bool? bit = this.ReadBit();
-                if (bit is null) throw new InvalidCastException("Number of bits out of range");
+                if (bit is null) throw new InvalidDataException("Number of bits out of range");
                 if ((bool)bit) result |= (uint)1 << i;
-                else result |= (uint)0 << i;    // we could skipp since we init it as row of 0s i guess
+                //else result |= (uint)0 << i;    // we can skipp since we init it as row of 0s i guess
             }
             return result;
         }

@@ -222,7 +222,7 @@ unsafe impl <T: Sync> Sync for RawArray<T> {}
 
 impl<T> RawArray<T> {
     fn new() -> Self {
-        assert!(mem::size_of::<T>() !=0, "TODO: implement Zero size allocation");
+        assert!(mem::size_of::<T>() !=0, "UNFINISHED: implement Zero size allocation");
         RawArray { 
             ptr: NonNull::dangling(), // like Unique<T> a wrapper over a raw pointer. (that cant be NULL and must be of type T)
             cap: 0, 
