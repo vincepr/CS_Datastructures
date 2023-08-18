@@ -78,6 +78,14 @@ namespace src.algorithms.Deflate
             uint len = _input.ReadUint(16);
             uint nlen = _input.ReadUint(16);
             if ((len ^ 0xFFFF) != nlen)
+                throw new InvalidDataException("Invalid lengh of uncompressed data block");
+            // copy bytes to stream directly
+            for (int i=0; i<len; i++)
+            {
+                byte b = (byte)_input.ReadUint(8);
+                _output.WriteByte(b);
+                _history.append(b);
+            }
 
             throw new NotImplementedException();
         }
