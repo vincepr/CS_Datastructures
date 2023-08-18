@@ -41,6 +41,8 @@ namespace src.algorithms.Deflate
 
             // Process of decompression:
             bool isFinal;
+            
+            do
             {
                 // Header Block
                 isFinal = input.ReadUint(1) != 0;       // BFINAL
@@ -118,7 +120,6 @@ namespace src.algorithms.Deflate
 
         private uint decodeRunLength(uint sym)
         {
-            Console.WriteLine(sym);
             if (257 > sym || sym > 287)
                 throw new ArgumentOutOfRangeException(nameof(sym), "Invalid run length symbol");
             if (sym <= 264) return sym - 254;

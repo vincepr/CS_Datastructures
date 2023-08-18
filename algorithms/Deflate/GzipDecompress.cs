@@ -34,11 +34,6 @@ internal class GzipDecompress
             // StreamReader vs BinaryReader here?
             using (var reader = new BinaryReader(stream))
             {
-                /* we can only use this to adjust encoding if using StreamReader
-                reader.Peek();
-                var encoding = reader.CurrentEncoding;
-                */
-
                 // 2 bytes initialisation - gzip magic number: 
                 var magicNr = reader.ReadUInt16();
                 if (!(magicNr == (UInt16)0x1F8B || magicNr == (UInt16)35615)) return "Invalid gzip magic number.";
@@ -109,15 +104,14 @@ internal class GzipDecompress
                 BitStream bitwiseInStream = new BitStream(underlyingStream);
 
                 // try to decompress
-                Decompressor.Decompress(bitwiseInStream, output);
-                //try
-                //{
-                //    Decompressor.Decompress(bitwiseInStream, output);
-                //}
-                //catch (Exception e)
-                //{
-                //    Console.Error.WriteLine($"Error: {e.Message}");
-                //}
+                try
+                {
+                    Decompressor.Decompress(bitwiseInStream, output);
+                }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine($"Error: {e.Message}");
+                }
                 // read footer and check checksumm
                 int crc = readLittleEndianInt32(reader);
                 int size = readLittleEndianInt32(reader);
@@ -126,15 +120,11 @@ internal class GzipDecompress
                 //    return $"Size mismatched. expected: {size} got: {output.Length}";
                 // TODO: check if calculated-crc == read crc-checksum matches up
                 
-                
-                dbgPrintOutStream(output);
+                //dbgPrintOutStream(output);
                 dbgWriteStreamToFile(output, outPath);
-                // TODO: check if checksum matches up
-
-
             };
         }
-        return "finished sucessfully";
+        return "finished successfully";
     }
 
     private static void dbgWriteStreamToFile(Stream output, string newFilePath)
@@ -151,6 +141,7 @@ internal class GzipDecompress
     {
         return BitConverter.ToInt32(reader.ReadBytes(4).ToArray());
     }
+    
     private static void dbgPrintOutStream(Stream output)
     {
         // Debuging only till we get anything working
@@ -173,12 +164,3 @@ internal class GzipDecompress
         return result;
     }
 }
-
-
-
-
-/*
-* 
-*  ---         ---        ---
-* 
-*/

@@ -2,7 +2,7 @@
   "profiles": {
     "src": {
       "commandName": "Project",
-      "commandLineArgs": "../../../algorithms/Deflate/test.txt.gz outfile.txt"
+      "commandLineArgs": "../../../algorithms/Deflate/test.png.gz outfile.png"
     }
   }
 }
