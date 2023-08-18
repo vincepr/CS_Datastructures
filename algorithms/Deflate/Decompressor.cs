@@ -71,6 +71,14 @@ namespace src.algorithms.Deflate
 
         private void decompressUncompressedBlock()
         {
+            // discard bits to allign to clean byte boundary
+            _input.AlignToByteBoundary();
+
+            // read length of block:
+            uint len = _input.ReadUint(16);
+            uint nlen = _input.ReadUint(16);
+            if ((len ^ 0xFFFF) != nlen)
+
             throw new NotImplementedException();
         }
 
